@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single Replacement Review Games</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ============== VIEW SYSTEM ============== */
+  .view { display: none; min-height: 100vh; }
+  .view.active { display: block; }
+
+  /* ============== MENU ============== */
+  .menu-hero {
+    background: linear-gradient(135deg, #1A6B6B 0%, #2A9D8F 100%);
+    color: white;
+    padding: 70px 40px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 2px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .menu-hero .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .menu-hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+  .menu-hero p {
+    font-size: 1.15rem;
+    opacity: 0.92;
+    max-width: 660px;
+    margin: 0 auto;
+  }
+  .menu-hero .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .menu-hero .badge-row span {
+    background: rgba(255,255,255,0.18);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .games-grid {
+    max-width: 1200px;
+    margin: -50px auto 40px;
+    padding: 0 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+  }
+  @media (max-width: 900px) {
+    .games-grid { grid-template-columns: 1fr; }
+  }
+
+  .game-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .game-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.14);
+  }
+  .game-card .card-header {
+    padding: 26px 24px 18px;
+    color: white;
+    position: relative;
+  }
+  .game-card.g1 .card-header { background: linear-gradient(135deg, #2A9D8F 0%, #1A6B6B 100%); }
+  .game-card.g2 .card-header { background: linear-gradient(135deg, #E65C3C 0%, #b8432a 100%); }
+  .game-card.g3 .card-header { background: linear-gradient(135deg, #D4A843 0%, #a8832f 100%); }
+
+  .game-card .pill {
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .game-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .game-card .subtitle {
+    font-size: 0.86rem;
+    opacity: 0.92;
+  }
+  .game-card .card-body {
+    padding: 22px 24px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .game-card .card-body p {
+    font-size: 0.92rem;
+    color: #555;
+    margin-bottom: 14px;
+    flex: 1;
+  }
+  .game-card .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .game-card .meta span {
+    background: #f0f5f4;
+    color: #1A6B6B;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .game-card .launch-btn {
+    background: linear-gradient(135deg, #1A6B6B 0%, #2A9D8F 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .game-card .launch-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,107,107,0.3); }
+  .game-card.g2 .launch-btn { background: linear-gradient(135deg, #E65C3C 0%, #b8432a 100%); }
+  .game-card.g2 .launch-btn:hover { box-shadow: 0 4px 14px rgba(230,92,60,0.3); }
+  .game-card.g3 .launch-btn { background: linear-gradient(135deg, #D4A843 0%, #a8832f 100%); color: #fff; }
+  .game-card.g3 .launch-btn:hover { box-shadow: 0 4px 14px rgba(212,168,67,0.35); }
+
+  .menu-footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    color: #888;
+    font-size: 0.8rem;
+  }
+  .menu-footer .logo-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* ============== GAME VIEW SHARED ============== */
+  .game-header {
+    padding: 18px 30px;
+    background: white;
+    border-bottom: 1px solid #e0ebe9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .back-btn {
+    background: #f0f5f4;
+    color: #1A6B6B;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { background: #dbe8e5; }
+
+  .game-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1A6B6B;
+  }
+  .question-counter {
+    background: #1A6B6B;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .stage {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 30px;
+  }
+
+  /* ============== TIMER ============== */
+  .timer-bar {
+    width: 100%;
+    height: 10px;
+    background: #e8f1f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2A9D8F, #D4A843);
+    width: 100%;
+    transition: width 0.3s linear;
+  }
+  .timer-fill.warn { background: linear-gradient(90deg, #D4A843, #E65C3C); }
+  .timer-fill.danger { background: linear-gradient(90deg, #E65C3C, #c0392b); animation: pulse 0.8s infinite; }
+  @keyframes pulse { 50% { opacity: 0.6; } }
+
+  .timer-display {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1A6B6B;
+    margin-bottom: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-display.danger { color: #E65C3C; }
+
+  /* ============== DIFFICULTY BADGE ============== */
+  .difficulty-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 14px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+  }
+  .diff-easy { background: #e8f5f3; color: #1A6B6B; }
+  .diff-medium { background: #fdf3e0; color: #b8860b; }
+  .diff-hard { background: #fce8e4; color: #c0392b; }
+  .diff-trivia { background: #f3e8ed; color: #7A2D4E; }
+
+  /* ============== QUESTION CARD ============== */
+  .question-card {
+    background: white;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+  }
+  .question-card.trivia-card {
+    background: linear-gradient(135deg, #fff8ee 0%, #fdf3e0 100%);
+    border: 2px solid #e8d080;
+    position: relative;
+    overflow: hidden;
+  }
+  .question-card.trivia-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #D4A843, #E65C3C, #7A2D4E);
+  }
+  .question-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1A6B6B;
+    margin-bottom: 28px;
+    line-height: 1.4;
+  }
+  .trivia-card .question-text {
+    color: #5a4410;
+    text-align: center;
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 700px) {
+    .choices { grid-template-columns: 1fr; }
+  }
+  .choice {
+    background: #f8fafa;
+    border: 2px solid #e0ebe9;
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 1.05rem;
+    color: #333;
+    transition: all 0.2s;
+  }
+  .choice .letter {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #1A6B6B;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+  }
+  .trivia-card .choice .letter {
+    background: #7A2D4E;
+  }
+  .choice.correct {
+    background: #e8f5f3;
+    border-color: #2A9D8F;
+  }
+  .choice.correct .letter {
+    background: #2A9D8F;
+  }
+  .choice.correct::after {
+    content: '\2713 CORRECT';
+    margin-left: auto;
+    color: #1A6B6B;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .trivia-card .choice.correct {
+    background: #f3e8ed;
+    border-color: #7A2D4E;
+  }
+  .trivia-card .choice.correct .letter {
+    background: #7A2D4E;
+  }
+  .trivia-card .choice.correct::after {
+    color: #7A2D4E;
+  }
+
+  /* ============== REVEAL CARD ============== */
+  .reveal-card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    border-left: 6px solid #2A9D8F;
+    margin-bottom: 20px;
+  }
+  .reveal-card.trivia-reveal { border-left-color: #7A2D4E; }
+  .reveal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .reveal-header .check {
+    width: 30px;
+    height: 30px;
+    background: #2A9D8F;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .reveal-card.trivia-reveal .check { background: #7A2D4E; }
+  .reveal-header h3 {
+    font-size: 1.15rem;
+    color: #1A6B6B;
+  }
+  .reveal-card.trivia-reveal .reveal-header h3 { color: #7A2D4E; }
+  .explanation {
+    font-size: 0.95rem;
+    color: #555;
+    padding: 14px 16px;
+    background: #f0f5f4;
+    border-radius: 10px;
+    line-height: 1.65;
+  }
+  .explanation strong { color: #1A6B6B; }
+  .reveal-card.trivia-reveal .explanation { background: #fdf3e0; }
+  .reveal-card.trivia-reveal .explanation strong { color: #7A2D4E; }
+
+  /* ============== CONTROLS ============== */
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #1A6B6B 0%, #2A9D8F 100%);
+    color: white;
+    min-width: 180px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,107,107,0.3); }
+  .btn-secondary {
+    background: #f0f5f4;
+    color: #1A6B6B;
+  }
+  .btn-secondary:hover { background: #dbe8e5; }
+  .btn-coral {
+    background: linear-gradient(135deg, #E65C3C 0%, #c0392b 100%);
+    color: white;
+    min-width: 180px;
+  }
+  .btn-coral:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(230,92,60,0.3); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .settings-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #555;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .settings-row label { font-weight: 600; color: #1A6B6B; }
+  .settings-row select {
+    padding: 6px 10px;
+    border: 1px solid #e0ebe9;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+  }
+
+  /* ============== APP FOOTER ============== */
+  .app-footer {
+    background: white;
+    border-top: 3px solid #D4A843;
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 60px;
+  }
+  .app-footer .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ============== SCOREBOARD ============== */
+  .scoreboard-inner {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #1A6B6B, #2A9D8F);
+    color: white;
+  }
+  .scoreboard-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 0 16px 0 0;
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,0.9);
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+  .team-card {
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 8px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 130px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .team-card.leader {
+    background: linear-gradient(135deg, #F5C04D, #D4A843);
+    color: #3a2c0a;
+    box-shadow: 0 0 20px rgba(245,192,77,0.4);
+  }
+  .team-card.leader::after {
+    content: 'LEADER';
+    position: absolute;
+    top: -8px;
+    right: 6px;
+    background: #7A2D4E;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+  }
+  .team-name-input {
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    color: inherit;
+    text-align: center;
+    width: 100%;
+    padding: 2px;
+    cursor: pointer;
+    font-family: inherit;
+    max-width: 130px;
+  }
+  .team-name-input:focus {
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    border-radius: 4px;
+    cursor: text;
+  }
+  .team-card.leader .team-name-input:focus { background: rgba(0,0,0,0.1); }
+  .team-score {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin: 2px 0;
+  }
+  .team-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .team-btn {
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .team-plus {
+    background: #2A9D8F;
+    color: white;
+    padding: 5px 14px;
+    font-size: 0.95rem;
+  }
+  .team-plus:hover { background: #22857a; transform: scale(1.05); }
+  .team-card.leader .team-plus { background: #1A6B6B; }
+  .team-minus {
+    background: rgba(230,92,60,0.7);
+    color: white;
+    padding: 3px 7px;
+    font-size: 0.7rem;
+  }
+  .team-minus:hover { background: #E65C3C; }
+  .scoreboard-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255,255,255,0.2);
+  }
+  .scoreboard-controls select, .scoreboard-controls button {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .scoreboard-controls button:hover, .scoreboard-controls select:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  .scoreboard-controls .btn-reset { background: rgba(230,92,60,0.7); border-color: rgba(230,92,60,0.8); }
+  .scoreboard-controls .btn-reset:hover { background: #E65C3C; }
+
+  #scoreboard-menu .scoreboard-inner {
+    background: white;
+    color: #1A6B6B;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin: 0 30px;
+  }
+  #scoreboard-menu .scoreboard-label {
+    color: #1A6B6B;
+    border-right-color: #e0ebe9;
+  }
+  #scoreboard-menu .team-card { background: #f0f5f4; }
+  #scoreboard-menu .team-card.leader { background: linear-gradient(135deg, #F5C04D, #D4A843); }
+  #scoreboard-menu .team-name-input { color: inherit; }
+  #scoreboard-menu .scoreboard-controls { border-left-color: #e0ebe9; }
+  #scoreboard-menu .scoreboard-controls select,
+  #scoreboard-menu .scoreboard-controls button {
+    background: #f0f5f4;
+    color: #1A6B6B;
+    border-color: #dbe8e5;
+  }
+  #scoreboard-menu .scoreboard-controls .btn-reset {
+    background: #fce8e4;
+    color: #c0392b;
+    border-color: #f5d1c9;
+  }
+
+  @media (max-width: 700px) {
+    .scoreboard-inner { padding: 10px; gap: 6px; }
+    .team-card { min-width: 100px; padding: 6px 8px; }
+    .team-score { font-size: 1.4rem; }
+    .scoreboard-label { padding-right: 8px; font-size: 0.65rem; }
+    .question-card { padding: 26px 20px; }
+    .question-text { font-size: 1.2rem; }
+    .menu-hero h1 { font-size: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =========== MENU VIEW =========== -->
+<div id="menu-view" class="view active">
+  <div class="menu-hero">
+    <div class="logo">
+      <svg width="40" height="40" viewBox="0 0 40 40">
+        <polygon points="13,2 24,13 13,24 2,13" fill="#0ABAB5" opacity="0.9"/>
+        <polygon points="27,2 38,13 27,24 16,13" fill="#F5B731" opacity="0.9"/>
+        <polygon points="13,16 24,27 13,38 2,27" fill="#E65C3C" opacity="0.9"/>
+        <polygon points="27,16 38,27 27,38 16,27" fill="#7A2D4E" opacity="0.9"/>
+      </svg>
+      <span style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.85; font-weight: 600;">SINGLE REPLACEMENT REACTIONS</span>
+    </div>
+    <h1>Review Games</h1>
+    <p>Three rounds covering the activity series, predicting reactions, and balancing single replacement equations. Every other question is a trivia break that rotates through general science, geography, and pop culture.</p>
+    <div class="badge-row">
+      <span>10 Qs PER GAME</span>
+      <span>5 CHEM + 5 TRIVIA</span>
+      <span>PROJECTOR READY</span>
+    </div>
+  </div>
+
+  <div class="games-grid">
+    <div class="game-card g1" onclick="showView('game1')">
+      <div class="card-header">
+        <span class="pill">GAME 1 - 15 MIN</span>
+        <h2>Will It React?</h2>
+        <div class="subtitle">Predict reaction or NR using the activity series</div>
+      </div>
+      <div class="card-body">
+        <p>Teams use the activity series to decide whether a reaction will happen and what the products are. Trivia breaks alternate between every chemistry question.</p>
+        <div class="meta">
+          <span>5 chem</span>
+          <span>5 trivia</span>
+          <span>30s timer</span>
+        </div>
+        <button class="launch-btn">Launch Game 1</button>
+      </div>
+    </div>
+
+    <div class="game-card g2" onclick="showView('game2')">
+      <div class="card-header">
+        <span class="pill">GAME 2 - 18 MIN</span>
+        <h2>Balance the Reaction</h2>
+        <div class="subtitle">Pick the correctly balanced single replacement equation</div>
+      </div>
+      <div class="card-body">
+        <p>Reactions where coefficients matter. Watch the cation charges, balance the polyatomic ions, and pick the only equation that conserves atoms on both sides.</p>
+        <div class="meta">
+          <span>5 chem</span>
+          <span>5 trivia</span>
+          <span>45s timer</span>
+        </div>
+        <button class="launch-btn">Launch Game 2</button>
+      </div>
+    </div>
+
+    <div class="game-card g3" onclick="showView('game3')">
+      <div class="card-header">
+        <span class="pill">GAME 3 - 20 MIN</span>
+        <h2>Mastery Round</h2>
+        <div class="subtitle">Conceptual + multi-step activity series puzzles</div>
+      </div>
+      <div class="card-body">
+        <p>The hard stuff. Why gold survives the centuries, what an unknown metal must be based on what it displaces, and the tricky "why is there a coefficient there?" questions.</p>
+        <div class="meta">
+          <span>5 chem</span>
+          <span>5 trivia</span>
+          <span>60s timer</span>
+        </div>
+        <button class="launch-btn">Launch Game 3</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-footer">
+    <div class="logo-small">
+      <svg width="18" height="18" viewBox="0 0 40 40">
+        <polygon points="13,2 24,13 13,24 2,13" fill="#0ABAB5" opacity="0.85"/>
+        <polygon points="27,2 38,13 27,24 16,13" fill="#F5B731" opacity="0.85"/>
+        <polygon points="13,16 24,27 13,38 2,27" fill="#E65C3C" opacity="0.85"/>
+        <polygon points="27,16 38,27 27,38 16,27" fill="#7A2D4E" opacity="0.85"/>
+      </svg>
+      <span>Press F to toggle fullscreen - ideal for projection</span>
+    </div>
+  </div>
+
+  <div class="scoreboard-mount" id="scoreboard-menu" style="margin-bottom: 30px;"></div>
+</div>
+
+<!-- =========== GAME 1 VIEW =========== -->
+<div id="game1-view" class="view">
+  <div class="game-header">
+    <button class="back-btn" onclick="showView('menu')">← Menu</button>
+    <div class="game-title">Will It React?</div>
+    <div class="question-counter" id="g1-counter">1 / 10</div>
+  </div>
+
+  <div class="scoreboard-mount" id="scoreboard-g1"></div>
+
+  <div class="stage">
+    <div class="settings-row" style="margin-bottom: 18px;">
+      <label>Timer:</label>
+      <select id="g1-timer-length" onchange="g1ResetTimer()">
+        <option value="20">20 sec</option>
+        <option value="30" selected>30 sec</option>
+        <option value="45">45 sec</option>
+        <option value="60">60 sec</option>
+      </select>
+      <button class="btn btn-secondary" onclick="g1PauseResume()" id="g1-pause-btn" style="padding: 6px 14px; font-size: 0.82rem;">Pause</button>
+    </div>
+
+    <div class="timer-bar"><div class="timer-fill" id="g1-timer-fill"></div></div>
+    <div class="timer-display" id="g1-timer-display">0:30</div>
+
+    <div class="question-card" id="g1-card">
+      <div class="difficulty-badge" id="g1-diff">EASY</div>
+      <div class="question-text" id="g1-question">Question text</div>
+      <div class="choices" id="g1-choices"></div>
+    </div>
+
+    <div class="controls" id="g1-controls">
+      <button class="btn btn-secondary" onclick="g1Back()">← Back</button>
+      <button class="btn btn-coral" onclick="g1Reveal()" id="g1-reveal-btn">Reveal Answer</button>
+      <button class="btn btn-primary" onclick="g1Next()" id="g1-next-btn" style="display: none;">Next Question →</button>
+    </div>
+
+    <div class="reveal-card" id="g1-explanation-card" style="display: none;">
+      <div class="reveal-header">
+        <div class="check">✓</div>
+        <h3>Why?</h3>
+      </div>
+      <div class="explanation" id="g1-explanation"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =========== GAME 2 VIEW =========== -->
+<div id="game2-view" class="view">
+  <div class="game-header">
+    <button class="back-btn" onclick="showView('menu')">← Menu</button>
+    <div class="game-title">Balance the Reaction</div>
+    <div class="question-counter" id="g2-counter">1 / 10</div>
+  </div>
+
+  <div class="scoreboard-mount" id="scoreboard-g2"></div>
+
+  <div class="stage">
+    <div class="settings-row" style="margin-bottom: 18px;">
+      <label>Timer:</label>
+      <select id="g2-timer-length" onchange="g2ResetTimer()">
+        <option value="30">30 sec</option>
+        <option value="45" selected>45 sec</option>
+        <option value="60">60 sec</option>
+        <option value="90">90 sec</option>
+      </select>
+      <button class="btn btn-secondary" onclick="g2PauseResume()" id="g2-pause-btn" style="padding: 6px 14px; font-size: 0.82rem;">Pause</button>
+    </div>
+
+    <div class="timer-bar"><div class="timer-fill" id="g2-timer-fill"></div></div>
+    <div class="timer-display" id="g2-timer-display">0:45</div>
+
+    <div class="question-card" id="g2-card">
+      <div class="difficulty-badge" id="g2-diff">MEDIUM</div>
+      <div class="question-text" id="g2-question">Question text</div>
+      <div class="choices" id="g2-choices"></div>
+    </div>
+
+    <div class="controls" id="g2-controls">
+      <button class="btn btn-secondary" onclick="g2Back()">← Back</button>
+      <button class="btn btn-coral" onclick="g2Reveal()" id="g2-reveal-btn">Reveal Answer</button>
+      <button class="btn btn-primary" onclick="g2Next()" id="g2-next-btn" style="display: none;">Next Question →</button>
+    </div>
+
+    <div class="reveal-card" id="g2-explanation-card" style="display: none;">
+      <div class="reveal-header">
+        <div class="check">✓</div>
+        <h3>Why?</h3>
+      </div>
+      <div class="explanation" id="g2-explanation"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =========== GAME 3 VIEW =========== -->
+<div id="game3-view" class="view">
+  <div class="game-header">
+    <button class="back-btn" onclick="showView('menu')">← Menu</button>
+    <div class="game-title">Mastery Round</div>
+    <div class="question-counter" id="g3-counter">1 / 10</div>
+  </div>
+
+  <div class="scoreboard-mount" id="scoreboard-g3"></div>
+
+  <div class="stage">
+    <div class="settings-row" style="margin-bottom: 18px;">
+      <label>Timer:</label>
+      <select id="g3-timer-length" onchange="g3ResetTimer()">
+        <option value="45">45 sec</option>
+        <option value="60" selected>60 sec</option>
+        <option value="90">90 sec</option>
+        <option value="120">120 sec</option>
+      </select>
+      <button class="btn btn-secondary" onclick="g3PauseResume()" id="g3-pause-btn" style="padding: 6px 14px; font-size: 0.82rem;">Pause</button>
+    </div>
+
+    <div class="timer-bar"><div class="timer-fill" id="g3-timer-fill"></div></div>
+    <div class="timer-display" id="g3-timer-display">1:00</div>
+
+    <div class="question-card" id="g3-card">
+      <div class="difficulty-badge" id="g3-diff">HARD</div>
+      <div class="question-text" id="g3-question">Question text</div>
+      <div class="choices" id="g3-choices"></div>
+    </div>
+
+    <div class="controls" id="g3-controls">
+      <button class="btn btn-secondary" onclick="g3Back()">← Back</button>
+      <button class="btn btn-coral" onclick="g3Reveal()" id="g3-reveal-btn">Reveal Answer</button>
+      <button class="btn btn-primary" onclick="g3Next()" id="g3-next-btn" style="display: none;">Next Question →</button>
+    </div>
+
+    <div class="reveal-card" id="g3-explanation-card" style="display: none;">
+      <div class="reveal-header">
+        <div class="check">✓</div>
+        <h3>Why?</h3>
+      </div>
+      <div class="explanation" id="g3-explanation"></div>
+    </div>
+  </div>
+</div>
+
+<div class="app-footer">
+  <div class="brand">
+    <svg width="16" height="16" viewBox="0 0 40 40">
+      <polygon points="13,2 24,13 13,24 2,13" fill="#0ABAB5" opacity="0.85"/>
+      <polygon points="27,2 38,13 27,24 16,13" fill="#F5B731" opacity="0.85"/>
+      <polygon points="13,16 24,27 13,38 2,27" fill="#E65C3C" opacity="0.85"/>
+      <polygon points="27,16 38,27 27,38 16,27" fill="#7A2D4E" opacity="0.85"/>
+    </svg>
+    <span>Single Replacement Review Games - Cycle 4</span>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SCOREBOARD - persistent team scoring with localStorage
+   ============================================================ */
+const SCORE_KEY = 'single-replacement-review-scores-v1';
+
+function loadScores() {
+  try {
+    const stored = localStorage.getItem(SCORE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return { teams: [
+    { name: 'Team 1', score: 0 },
+    { name: 'Team 2', score: 0 },
+    { name: 'Team 3', score: 0 },
+    { name: 'Team 4', score: 0 }
+  ]};
+}
+function saveScores() {
+  try { localStorage.setItem(SCORE_KEY, JSON.stringify(scoreState)); } catch (e) {}
+}
+let scoreState = loadScores();
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildScoreboardHTML() {
+  const maxScore = Math.max(0, ...scoreState.teams.map(t => t.score));
+  let html = '<div class="scoreboard-inner"><div class="scoreboard-label">SCORES</div>';
+  scoreState.teams.forEach((t, i) => {
+    const isLeader = t.score > 0 && t.score === maxScore;
+    html += '<div class="team-card ' + (isLeader ? 'leader' : '') + '">';
+    html += '<input class="team-name-input" value="' + escapeHtml(t.name) + '" ' +
+            'onchange="renameTeam(' + i + ', this.value)" ' +
+            'onfocus="this.select()">';
+    html += '<div class="team-score">' + t.score + '</div>';
+    html += '<div class="team-controls">';
+    html += '<button class="team-btn team-plus" onclick="addPoint(' + i + ')" title="Award point">+1</button>';
+    html += '<button class="team-btn team-minus" onclick="subtractPoint(' + i + ')" title="Undo">-</button>';
+    html += '</div></div>';
+  });
+  html += '<div class="scoreboard-controls">';
+  html += '<select onchange="setTeamCount(this.value)" title="Number of teams">';
+  for (let n = 2; n <= 5; n++) {
+    html += '<option value="' + n + '"' + (scoreState.teams.length === n ? ' selected' : '') + '>' + n + ' teams</option>';
+  }
+  html += '</select>';
+  html += '<button class="btn-reset" onclick="resetScores()" title="Reset all scores to zero">Reset</button>';
+  html += '</div></div>';
+  return html;
+}
+function renderScoreboards() {
+  const html = buildScoreboardHTML();
+  document.querySelectorAll('.scoreboard-mount').forEach(el => {
+    const active = document.activeElement;
+    if (active && el.contains(active) && active.classList && active.classList.contains('team-name-input')) return;
+    el.innerHTML = html;
+  });
+}
+function addPoint(i) { scoreState.teams[i].score++; saveScores(); renderScoreboards(); }
+function subtractPoint(i) { scoreState.teams[i].score = Math.max(0, scoreState.teams[i].score - 1); saveScores(); renderScoreboards(); }
+function renameTeam(i, name) {
+  scoreState.teams[i].name = (name || '').trim() || ('Team ' + (i + 1));
+  saveScores();
+  renderScoreboards();
+}
+function setTeamCount(n) {
+  n = parseInt(n);
+  while (scoreState.teams.length < n) scoreState.teams.push({ name: 'Team ' + (scoreState.teams.length + 1), score: 0 });
+  while (scoreState.teams.length > n) scoreState.teams.pop();
+  saveScores();
+  renderScoreboards();
+}
+function resetScores() {
+  if (!confirm('Reset all team scores to zero?\n(Team names will be kept.)')) return;
+  scoreState.teams.forEach(t => t.score = 0);
+  saveScores();
+  renderScoreboards();
+}
+
+/* ============================================================
+   GAME DATA
+   Pattern per game (10 Qs):
+   chem, trivia, chem, trivia, chem, trivia, chem, trivia, chem, trivia
+   Trivia rotation across the 3 games:
+     G1: gen sci, geography, pop, gen sci, geography
+     G2: pop, gen sci, geography, pop, gen sci
+     G3: geography, pop, gen sci, geography, pop
+   Answer positions are MIXED across the 30 Qs (not always B).
+   ============================================================ */
+
+const G1_DATA = [
+  // Q1 chem - easy
+  { type: 'chem', difficulty: 'easy',
+    q: 'Calcium metal is dropped into a copper(II) chloride solution. Which equation correctly shows what happens?',
+    choices: [
+      'Ca + CuCl<sub>2</sub> &rarr; CaCl + CuCl',
+      'Ca + CuCl<sub>2</sub> &rarr; CaCl<sub>2</sub> + Cu',
+      'NR &mdash; calcium and copper do not react',
+      'Ca + 2CuCl<sub>2</sub> &rarr; CaCl<sub>4</sub> + 2Cu'
+    ], answer: 1,
+    explanation: 'Calcium is much higher than copper on the activity series, so Ca displaces Cu<sup>2+</sup>. Both Ca and Cu form 2+ ions, so the Cl<sub>2</sub> just swaps partners. Single replacement, no coefficients needed.'
+  },
+  // Q2 trivia - GEN SCI
+  { type: 'trivia', category: 'GENERAL SCIENCE',
+    q: 'The Doppler effect explains why an ambulance siren drops in pitch as it passes you. Which other phenomenon is caused by the SAME effect?',
+    choices: [
+      'The redshift of distant galaxies',
+      'Why the sky is blue',
+      'Total solar eclipses',
+      'The northern lights'
+    ], answer: 0,
+    explanation: '<strong>Redshift.</strong> Light from galaxies moving away from us shifts to longer (redder) wavelengths &mdash; the same Doppler shift that lowers the siren’s pitch as it recedes. Edwin Hubble used this in the 1920s to prove the universe is expanding.'
+  },
+  // Q3 chem - easy
+  { type: 'chem', difficulty: 'easy',
+    q: 'Silver metal is placed in a magnesium chloride solution. What happens?',
+    choices: [
+      'Ag + MgCl &rarr; AgCl + Mg',
+      '2Ag + MgCl<sub>2</sub> &rarr; 2AgCl + Mg',
+      'NR &mdash; silver is below magnesium on the activity series',
+      'Ag + MgCl<sub>2</sub> &rarr; AgMgCl<sub>3</sub>'
+    ], answer: 2,
+    explanation: 'For a single replacement to occur, the lone metal must be MORE reactive than the metal in the salt. Silver sits far below magnesium on the activity series, so it cannot displace Mg<sup>2+</sup>. <strong>NR.</strong>'
+  },
+  // Q4 trivia - GEOGRAPHY
+  { type: 'trivia', category: 'GEOGRAPHY',
+    q: 'Brazil shares a border with every country in South America EXCEPT for Chile and which other country?',
+    choices: [
+      'Colombia',
+      'Ecuador',
+      'Peru',
+      'Bolivia'
+    ], answer: 1,
+    explanation: '<strong>Ecuador.</strong> Brazil borders 10 of South America’s 12 nations &mdash; everyone except Ecuador and Chile. Ecuador is wedged between Colombia and Peru on the Pacific side and never reaches Brazil’s western edge.'
+  },
+  // Q5 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Zinc metal is added to a copper(II) nitrate solution. Which equation correctly describes the reaction?',
+    choices: [
+      'Zn + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; ZnCu + 2NO<sub>3</sub>',
+      'Zn + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; Zn(NO<sub>3</sub>)<sub>2</sub> + Cu',
+      'NR &mdash; zinc and copper are both transition metals so neither displaces the other',
+      '2Zn + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; Zn<sub>2</sub>(NO<sub>3</sub>)<sub>2</sub> + Cu'
+    ], answer: 1,
+    explanation: 'Zinc is above copper on the activity series, so Zn replaces Cu<sup>2+</sup>. Both metals form 2+ ions, so the nitrate count balances 1:1. This is the classic chemistry-lab demonstration where blue solution turns clear and copper coats the zinc.'
+  },
+  // Q6 trivia - POP CULTURE
+  { type: 'trivia', category: 'POP CULTURE',
+    q: 'Taylor Swift’s re-recorded "Taylor’s Version" albums exist because of a dispute over ownership of her:',
+    choices: [
+      'Master recordings',
+      'Original song lyrics',
+      'Album cover art',
+      'Concert film footage'
+    ], answer: 0,
+    explanation: '<strong>Master recordings.</strong> When her old label Big Machine sold her catalog to Scooter Braun in 2019, Taylor lost control of the masters of her first six albums. She legally cannot stop those originals being licensed for ads or films, so she is re-recording every album to make the originals lose their value.'
+  },
+  // Q7 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Copper wire is dropped into a magnesium nitrate solution. What is the predicted result?',
+    choices: [
+      'Cu + Mg(NO<sub>3</sub>)<sub>2</sub> &rarr; Cu(NO<sub>3</sub>)<sub>2</sub> + Mg',
+      'Cu + Mg(NO<sub>3</sub>)<sub>2</sub> &rarr; CuMg + 2NO<sub>3</sub>',
+      '2Cu + Mg(NO<sub>3</sub>)<sub>2</sub> &rarr; Cu<sub>2</sub>(NO<sub>3</sub>)<sub>2</sub> + Mg',
+      'NR &mdash; copper is less reactive than magnesium'
+    ], answer: 3,
+    explanation: 'Copper sits far below magnesium on the activity series. A less reactive metal cannot displace a more reactive metal from solution. <strong>NR.</strong> If you reversed it (Mg into Cu(NO<sub>3</sub>)<sub>2</sub>), it would absolutely react.'
+  },
+  // Q8 trivia - GEN SCI
+  { type: 'trivia', category: 'GENERAL SCIENCE',
+    q: 'DNA replication is described as "semi-conservative." What does that actually mean?',
+    choices: [
+      'Each new DNA molecule contains one original strand and one new strand',
+      'Half of all DNA in a cell is replaced each cell cycle',
+      'DNA conserves energy by replicating only at night',
+      'Only the conserved (non-mutating) regions are copied'
+    ], answer: 0,
+    explanation: 'Each parental double helix unwinds, and each strand serves as a template for a new complementary strand. Result: every daughter molecule is half-old, half-new. <strong>Meselson and Stahl proved this in 1958</strong> using nitrogen isotopes.'
+  },
+  // Q9 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Nickel metal is placed in a copper(II) nitrate solution. (Ni forms Ni<sup>2+</sup>.) Which is the correctly balanced product?',
+    choices: [
+      'Ni + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; Ni(NO<sub>3</sub>)<sub>2</sub> + Cu',
+      'Ni + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; NiCu + 2NO<sub>3</sub>',
+      'NR &mdash; both are transition metals so neither displaces the other',
+      '2Ni + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; Ni<sub>2</sub>(NO<sub>3</sub>)<sub>2</sub> + Cu'
+    ], answer: 0,
+    explanation: 'Nickel is above copper on the activity series, so Ni replaces Cu<sup>2+</sup>. Both form 2+ ions, so the nitrates swap one-for-one with no extra coefficients.'
+  },
+  // Q10 trivia - GEOGRAPHY
+  { type: 'trivia', category: 'GEOGRAPHY',
+    q: 'The Sahara Desert spreads across northern Africa. Which of these statements about its political geography is TRUE?',
+    choices: [
+      'Morocco is entirely contained within the Sahara',
+      'Egypt is entirely contained within the Sahara',
+      'No single country is fully contained inside the Sahara',
+      'Sudan is entirely contained within the Sahara'
+    ], answer: 2,
+    explanation: 'The Sahara crosses 11 countries, but every one of them has populated regions outside the desert &mdash; Morocco has the Atlas mountains and the Mediterranean coast, Egypt has the Nile Valley, Sudan has tropical savanna in the south, and so on. <strong>No country is entirely Sahara.</strong>'
+  }
+];
+
+const G2_DATA = [
+  // Q1 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Aluminum metal is placed in a silver(I) chloride solution. (Al forms Al<sup>3+</sup>.) What is the correctly balanced equation?',
+    choices: [
+      'Al + AgCl &rarr; AlCl + Ag',
+      'Al + 3AgCl &rarr; AlCl<sub>3</sub> + 3Ag',
+      '3Al + AgCl &rarr; Al<sub>3</sub>Cl + Ag',
+      'NR &mdash; aluminum is too inert because of its oxide layer'
+    ], answer: 1,
+    explanation: 'Al is above Ag on the activity series, so it displaces silver. Al becomes Al<sup>3+</sup>, which needs 3 Cl<sup>−</sup> ions to balance. That requires 3 AgCl on the left, which produces 3 Ag atoms on the right. <strong>Al + 3AgCl &rarr; AlCl<sub>3</sub> + 3Ag.</strong>'
+  },
+  // Q2 trivia - POP CULTURE
+  { type: 'trivia', category: 'POP CULTURE',
+    q: 'Which streaming series, based on a video game, became the most-watched HBO series premiere in over a decade when it debuted in 2023?',
+    choices: [
+      'Halo',
+      'The Last of Us',
+      'Fallout',
+      'Arcane'
+    ], answer: 1,
+    explanation: '<strong>The Last of Us</strong> drew 4.7 million viewers on its premiere night and grew to 32 million per episode by season’s end. Based on the 2013 PlayStation game. <em>Fallout</em> later broke records on Amazon Prime in 2024. <em>Arcane</em> is on Netflix.'
+  },
+  // Q3 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Aluminum metal is added to a zinc(II) nitrate solution. (Al forms Al<sup>3+</sup>, Zn forms Zn<sup>2+</sup>.) Which is the correctly balanced equation?',
+    choices: [
+      'Al + Zn(NO<sub>3</sub>)<sub>2</sub> &rarr; Al(NO<sub>3</sub>) + Zn(NO<sub>3</sub>)',
+      '3Al + 2Zn(NO<sub>3</sub>)<sub>3</sub> &rarr; 3Al(NO<sub>3</sub>)<sub>2</sub> + 2Zn',
+      'NR &mdash; aluminum cannot displace zinc',
+      '2Al + 3Zn(NO<sub>3</sub>)<sub>2</sub> &rarr; 2Al(NO<sub>3</sub>)<sub>3</sub> + 3Zn'
+    ], answer: 3,
+    explanation: 'Al is above Zn on the activity series, so Al replaces Zn<sup>2+</sup>. The trick is the charges: Al<sup>3+</sup> needs three NO<sub>3</sub><sup>−</sup>, Zn<sup>2+</sup> needs two. The least common multiple of 3 and 2 is 6, so you need <strong>2 Al, 3 Zn(NO<sub>3</sub>)<sub>2</sub>, 2 Al(NO<sub>3</sub>)<sub>3</sub>, and 3 Zn</strong>.'
+  },
+  // Q4 trivia - GEN SCI
+  { type: 'trivia', category: 'GENERAL SCIENCE',
+    q: 'Mitochondria carry their own DNA, separate from the nucleus. The most accepted explanation — the endosymbiotic theory — says that mitochondria were originally:',
+    choices: [
+      'Crystals that early life formed around',
+      'Pieces of nuclear DNA that broke off',
+      'Free-living bacteria engulfed by an early eukaryotic cell',
+      'Viruses that infected early cells'
+    ], answer: 2,
+    explanation: 'Roughly 1.5 billion years ago, an early cell engulfed an aerobic bacterium and instead of digesting it, the two formed a permanent partnership. The bacterium became the mitochondrion. Same story for chloroplasts in plants. <strong>Lynn Margulis</strong> was ridiculed for proposing this in the 1960s &mdash; now it is textbook.'
+  },
+  // Q5 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Tin metal is dropped into silver(I) nitrate. (Sn forms Sn<sup>2+</sup>.) What is the balanced equation?',
+    choices: [
+      'Sn + AgNO<sub>3</sub> &rarr; SnNO<sub>3</sub> + Ag',
+      'NR &mdash; both metals are below copper so neither reacts',
+      'Sn + 2AgNO<sub>3</sub> &rarr; Sn(NO<sub>3</sub>)<sub>2</sub> + 2Ag',
+      '2Sn + AgNO<sub>3</sub> &rarr; Sn<sub>2</sub>NO<sub>3</sub> + Ag'
+    ], answer: 2,
+    explanation: 'Sn is above Ag on the activity series. Sn becomes Sn<sup>2+</sup>, so it needs two NO<sub>3</sub><sup>−</sup> ions to balance, which means 2 AgNO<sub>3</sub> on the left and 2 Ag on the right. <strong>Sn + 2AgNO<sub>3</sub> &rarr; Sn(NO<sub>3</sub>)<sub>2</sub> + 2Ag.</strong>'
+  },
+  // Q6 trivia - GEOGRAPHY
+  { type: 'trivia', category: 'GEOGRAPHY',
+    q: 'Mount Everest sits on the border between Nepal and which other country?',
+    choices: [
+      'China (Tibet)',
+      'India',
+      'Pakistan',
+      'Bhutan'
+    ], answer: 0,
+    explanation: '<strong>China.</strong> The summit ridge straddles Nepal and the Tibet Autonomous Region. Nepalese climbers approach from the south (the famous Khumbu Icefall route), Chinese climbers from the north. K2, the second-highest peak, sits on the China-Pakistan border.'
+  },
+  // Q7 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Lithium metal is placed in a copper(II) nitrate solution. Which is the correctly balanced equation?',
+    choices: [
+      '2Li + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; 2LiNO<sub>3</sub> + Cu',
+      'Li + Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; LiNO<sub>3</sub> + Cu(NO<sub>3</sub>)',
+      'NR &mdash; lithium is too reactive to displace copper safely',
+      'Li + 2Cu(NO<sub>3</sub>)<sub>2</sub> &rarr; LiCu<sub>2</sub>(NO<sub>3</sub>)<sub>2</sub>'
+    ], answer: 0,
+    explanation: 'Lithium is at the very top of the activity series. It easily displaces Cu<sup>2+</sup>. The catch is the charges: Li becomes Li<sup>+</sup> (only 1+), so it takes <strong>2 Li atoms</strong> to balance the two NO<sub>3</sub><sup>−</sup> from one Cu(NO<sub>3</sub>)<sub>2</sub>.'
+  },
+  // Q8 trivia - POP CULTURE
+  { type: 'trivia', category: 'POP CULTURE',
+    q: 'Beyoncé’s 2024 album <em>Cowboy Carter</em> made her the first Black woman to top which Billboard chart?',
+    choices: [
+      'Top R&B Albums',
+      'Hot 100',
+      'Top Country Albums',
+      'Streaming Songs'
+    ], answer: 2,
+    explanation: '<strong>Top Country Albums.</strong> Released March 2024, <em>Cowboy Carter</em> was partly Beyoncé’s response to backlash she faced after performing at the 2016 CMA Awards. It also won Album of the Year at the 2025 Grammys.'
+  },
+  // Q9 chem - medium
+  { type: 'chem', difficulty: 'medium',
+    q: 'Zinc metal is placed in iron(II) chloride solution. (Zn forms Zn<sup>2+</sup>, Fe forms Fe<sup>2+</sup>.) What is the balanced product?',
+    choices: [
+      'NR &mdash; zinc is below iron in the activity series',
+      'Zn + FeCl<sub>2</sub> &rarr; ZnFe + 2Cl',
+      '2Zn + FeCl<sub>2</sub> &rarr; Zn<sub>2</sub>Cl + Fe + Cl',
+      'Zn + FeCl<sub>2</sub> &rarr; ZnCl<sub>2</sub> + Fe'
+    ], answer: 3,
+    explanation: 'Zn is ABOVE Fe on the activity series, so the reaction proceeds. Both form 2+ ions, so chlorides balance one-for-one with no extra coefficients. <strong>Zn + FeCl<sub>2</sub> &rarr; ZnCl<sub>2</sub> + Fe.</strong>'
+  },
+  // Q10 trivia - GEN SCI
+  { type: 'trivia', category: 'GENERAL SCIENCE',
+    q: 'If you doubled the speed of a car, how much would its kinetic energy change?',
+    choices: [
+      'Stay the same &mdash; kinetic energy does not depend on speed',
+      'Double',
+      'Quadruple (4x)',
+      'Increase by 8x'
+    ], answer: 2,
+    explanation: '<strong>KE = ½mv².</strong> Velocity is squared, so doubling v multiplies kinetic energy by 4. This is why a 60 mph crash is FOUR times more energetic than a 30 mph crash, not just twice as bad &mdash; the same reason highway speed limits matter so much.'
+  }
+];
+
+const G3_DATA = [
+  // Q1 chem - hard conceptual
+  { type: 'chem', difficulty: 'hard',
+    q: 'Gold (Au) sits at the very bottom of the activity series. Which statement BEST explains why gold jewelry survives buried in tombs for thousands of years?',
+    choices: [
+      'Gold has the lowest melting point of all metals',
+      'Gold’s nucleus has too many neutrons to react',
+      'Gold holds onto its valence electrons so tightly that it rarely gets oxidized',
+      'Gold ions are smaller than silver ions, blocking water'
+    ], answer: 2,
+    explanation: 'Position on the activity series IS a statement about how easily a metal loses electrons. Gold sits at the bottom because it has a strong hold on its valence electrons. <strong>It almost never gets oxidized</strong>, which is why it doesn’t corrode, tarnish, or react with most acids — and why pharaohs’ gold masks still gleam.'
+  },
+  // Q2 trivia - GEOGRAPHY
+  { type: 'trivia', category: 'GEOGRAPHY',
+    q: 'Which of the world’s five oceans is the SMALLEST?',
+    choices: [
+      'Atlantic',
+      'Indian',
+      'Southern (Antarctic)',
+      'Arctic'
+    ], answer: 3,
+    explanation: '<strong>Arctic.</strong> About 14 million km² — only ~1.5x the area of the United States. The Pacific is the largest at over 165 million km². The Southern Ocean was officially recognized as the fifth ocean by the International Hydrographic Organization in 2000.'
+  },
+  // Q3 chem - hard conceptual
+  { type: 'chem', difficulty: 'hard',
+    q: 'Which combination would NOT undergo a single replacement reaction?',
+    choices: [
+      'Mg(s) + Pb(NO<sub>3</sub>)<sub>2</sub>(aq)',
+      'Ca(s) + Hg(NO<sub>3</sub>)<sub>2</sub>(aq)',
+      'Pb(s) + AgNO<sub>3</sub>(aq)',
+      'Ag(s) + CuSO<sub>4</sub>(aq)'
+    ], answer: 3,
+    explanation: 'For a single replacement to proceed, the lone metal must be ABOVE the metal in the salt on the activity series. Mg, Ca, and Pb each sit above their target. <strong>Silver is BELOW copper on the activity series</strong>, so Ag(s) + CuSO<sub>4</sub>(aq) does not react.'
+  },
+  // Q4 trivia - POP CULTURE
+  { type: 'trivia', category: 'POP CULTURE',
+    q: 'Which film became the highest-grossing animated movie of all time when it released in 2024?',
+    choices: [
+      'Frozen II',
+      'The Super Mario Bros. Movie',
+      'Despicable Me 4',
+      'Inside Out 2'
+    ], answer: 3,
+    explanation: '<strong>Inside Out 2</strong> earned over $1.69 billion worldwide, surpassing the Frozen films and Pixar’s previous entries. Pixar’s biggest hit ever. <em>The Super Mario Bros. Movie</em> made about $1.36 billion in 2023, also massive but not the record.'
+  },
+  // Q5 chem - hard
+  { type: 'chem', difficulty: 'hard',
+    q: 'Lead metal is added to silver(I) nitrate solution. (Pb forms Pb<sup>2+</sup>.) Which is the correctly balanced equation?',
+    choices: [
+      'Pb + AgNO<sub>3</sub> &rarr; PbNO<sub>3</sub> + Ag',
+      'Pb + 2AgNO<sub>3</sub> &rarr; Pb(NO<sub>3</sub>)<sub>2</sub> + 2Ag',
+      '2Pb + AgNO<sub>3</sub> &rarr; Pb<sub>2</sub>NO<sub>3</sub> + Ag',
+      'NR &mdash; lead is too dense to react in solution'
+    ], answer: 1,
+    explanation: 'Pb is above Ag on the activity series. Pb becomes Pb<sup>2+</sup>, which needs 2 NO<sub>3</sub><sup>−</sup> ions, so the equation requires 2 AgNO<sub>3</sub> on the left and produces 2 Ag on the right. The product solution turns from colorless to slightly cloudy as silver crystals coat the lead.'
+  },
+  // Q6 trivia - GEN SCI
+  { type: 'trivia', category: 'GENERAL SCIENCE',
+    q: 'An MRI machine creates images of the inside of the human body using:',
+    choices: [
+      'Tiny doses of X-rays',
+      'Sound waves bouncing off organs',
+      'Radioactive dye injected into the bloodstream',
+      'Powerful magnets that align hydrogen atoms in your body'
+    ], answer: 3,
+    explanation: '<strong>MRI = Magnetic Resonance Imaging.</strong> The magnet aligns the protons in your body’s water and fat. A radio pulse knocks them off alignment; as they snap back, they emit detectable radio signals. No ionizing radiation involved &mdash; that’s X-ray and CT scans.'
+  },
+  // Q7 chem - hard
+  { type: 'chem', difficulty: 'hard',
+    q: 'When magnesium reacts with silver nitrate, the equation is Mg + 2AgNO<sub>3</sub> &rarr; Mg(NO<sub>3</sub>)<sub>2</sub> + 2Ag. Why is the coefficient "2" needed in front of AgNO<sub>3</sub>?',
+    choices: [
+      'Because magnesium has 2 atoms in its solid form',
+      'Because Mg<sup>2+</sup> requires 2 NO<sub>3</sub><sup>−</sup> ions, and each AgNO<sub>3</sub> only supplies one',
+      'Because silver always exists in pairs',
+      'Because the reaction releases 2 electrons of energy'
+    ], answer: 1,
+    explanation: 'Mg loses 2 electrons to become Mg<sup>2+</sup>. To make a neutral compound with NO<sub>3</sub><sup>−</sup>, you need TWO nitrate ions (Mg(NO<sub>3</sub>)<sub>2</sub>). Each AgNO<sub>3</sub> only delivers one nitrate, so you need <strong>two of them</strong> on the left, which then frees up two Ag on the right.'
+  },
+  // Q8 trivia - GEOGRAPHY
+  { type: 'trivia', category: 'GEOGRAPHY',
+    q: 'About what fraction of the world’s daily oil shipments pass through the Strait of Hormuz between Iran and Oman?',
+    choices: [
+      'Less than 5%',
+      'About 20%',
+      'About 10%',
+      'About 50%'
+    ], answer: 1,
+    explanation: '<strong>About 20%</strong> of global oil supply (and roughly a third of all seaborne crude) passes through this 21-mile-wide chokepoint. That is why every Middle East crisis spikes oil prices &mdash; markets fear the strait gets closed.'
+  },
+  // Q9 chem - hard puzzle
+  { type: 'chem', difficulty: 'hard',
+    q: 'A strip of an unknown metal X is placed in three solutions. It DISPLACES Cu from CuSO<sub>4</sub> and DISPLACES Pb from Pb(NO<sub>3</sub>)<sub>2</sub>, but it does NOT displace Mg from MgCl<sub>2</sub>. Which metal could X be?',
+    choices: [
+      'Sodium',
+      'Calcium',
+      'Iron',
+      'Silver'
+    ], answer: 2,
+    explanation: 'X must be MORE reactive than both Cu and Pb, but LESS reactive than Mg. On the activity series: Mg is high up, then Al, Mn, Zn, Cr, <strong>Fe</strong>, Cd, Co, Ni, Sn, Pb, Cu. <strong>Iron</strong> sits in the sweet spot — below Mg but above Pb and Cu. Sodium and calcium are above Mg (would react), and silver is below Cu (would not displace it).'
+  },
+  // Q10 trivia - POP CULTURE
+  { type: 'trivia', category: 'POP CULTURE',
+    q: 'TikTok was developed by which Chinese tech company?',
+    choices: [
+      'Tencent',
+      'Alibaba',
+      'Baidu',
+      'ByteDance'
+    ], answer: 3,
+    explanation: '<strong>ByteDance</strong> launched the Chinese version (Douyin) in 2016 and the international version (TikTok) in 2017. The US Congress passed a law in 2024 requiring ByteDance to divest TikTok or face a ban &mdash; that fight is still moving through the courts. Tencent owns WeChat, Alibaba runs Taobao, and Baidu is the major Chinese search engine.'
+  }
+];
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name + '-view').classList.add('active');
+  if (name === 'game1') g1Reset();
+  if (name === 'game2') g2Reset();
+  if (name === 'game3') g3Reset();
+  if (name === 'menu') {
+    g1Stop(); g2Stop(); g3Stop();
+  }
+  renderScoreboards();
+  window.scrollTo(0, 0);
+}
+
+function renderChoices(containerId, choices) {
+  const cc = document.getElementById(containerId);
+  cc.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  choices.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'choice';
+    div.setAttribute('data-idx', i);
+    div.innerHTML = '<div class="letter">' + letters[i] + '</div><div>' + c + '</div>';
+    cc.appendChild(div);
+  });
+}
+
+function markCorrect(containerId, answer) {
+  const choices = document.querySelectorAll('#' + containerId + ' .choice');
+  choices.forEach((c, i) => {
+    if (i === answer) c.classList.add('correct');
+  });
+}
+
+/* ============================================================
+   SHARED GAME ENGINE FACTORY
+   ============================================================ */
+function makeGame(prefix, dataset) {
+  const state = { index: 0, timer: null, remaining: 0, paused: false };
+  const getEl = id => document.getElementById(prefix + '-' + id);
+
+  function stop() { if (state.timer) { clearInterval(state.timer); state.timer = null; } }
+  function pauseResume() {
+    state.paused = !state.paused;
+    getEl('pause-btn').textContent = state.paused ? 'Resume' : 'Pause';
+  }
+  function updateTimer() {
+    const total = parseInt(getEl('timer-length').value);
+    const pct = Math.max(0, (state.remaining / total) * 100);
+    const fill = getEl('timer-fill');
+    const disp = getEl('timer-display');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('warn', pct < 40 && pct >= 15);
+    fill.classList.toggle('danger', pct < 15);
+    disp.classList.toggle('danger', pct < 15);
+    const m = Math.floor(Math.max(0, state.remaining) / 60);
+    const s = Math.max(0, state.remaining) % 60;
+    disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  function startTimer() {
+    stop();
+    state.paused = false;
+    getEl('pause-btn').textContent = 'Pause';
+    state.timer = setInterval(() => {
+      if (!state.paused) {
+        state.remaining--;
+        updateTimer();
+        if (state.remaining <= 0) { stop(); }
+      }
+    }, 1000);
+  }
+  function resetTimer() {
+    stop();
+    state.remaining = parseInt(getEl('timer-length').value);
+    updateTimer();
+    startTimer();
+  }
+  function render() {
+    const d = dataset[state.index];
+    getEl('counter').textContent = (state.index + 1) + ' / ' + dataset.length;
+    getEl('question').innerHTML = d.q;
+    const card = getEl('card');
+    const db = getEl('diff');
+    if (d.type === 'trivia') {
+      card.classList.add('trivia-card');
+      db.textContent = 'TRIVIA · ' + d.category;
+      db.className = 'difficulty-badge diff-trivia';
+    } else {
+      card.classList.remove('trivia-card');
+      db.textContent = d.difficulty.toUpperCase();
+      db.className = 'difficulty-badge diff-' + d.difficulty;
+    }
+    renderChoices(prefix + '-choices', d.choices);
+    getEl('reveal-btn').style.display = 'inline-block';
+    getEl('next-btn').style.display = 'none';
+    getEl('explanation-card').style.display = 'none';
+    state.remaining = parseInt(getEl('timer-length').value);
+    updateTimer();
+    startTimer();
+  }
+  function reveal() {
+    stop();
+    const d = dataset[state.index];
+    markCorrect(prefix + '-choices', d.answer);
+    getEl('explanation').innerHTML = d.explanation;
+    const card = getEl('explanation-card');
+    card.classList.toggle('trivia-reveal', d.type === 'trivia');
+    card.style.display = 'block';
+    getEl('reveal-btn').style.display = 'none';
+    getEl('next-btn').style.display = 'inline-block';
+    getEl('next-btn').textContent =
+      (state.index >= dataset.length - 1) ? 'Finish →' : 'Next Question →';
+  }
+  function back() { showView('menu'); }
+  function next() {
+    if (state.index >= dataset.length - 1) { showView('menu'); return; }
+    state.index++;
+    render();
+  }
+  function reset() { state.index = 0; render(); }
+
+  return { reset, stop, render, reveal, back, next, pauseResume, resetTimer };
+}
+
+const G1 = makeGame('g1', G1_DATA);
+const G2 = makeGame('g2', G2_DATA);
+const G3 = makeGame('g3', G3_DATA);
+
+function g1Reset(){G1.reset();}  function g1Stop(){G1.stop();}
+function g1Reveal(){G1.reveal();} function g1Back(){G1.back();}
+function g1Next(){G1.next();}     function g1PauseResume(){G1.pauseResume();}
+function g1ResetTimer(){G1.resetTimer();}
+
+function g2Reset(){G2.reset();}  function g2Stop(){G2.stop();}
+function g2Reveal(){G2.reveal();} function g2Back(){G2.back();}
+function g2Next(){G2.next();}     function g2PauseResume(){G2.pauseResume();}
+function g2ResetTimer(){G2.resetTimer();}
+
+function g3Reset(){G3.reset();}  function g3Stop(){G3.stop();}
+function g3Reveal(){G3.reveal();} function g3Back(){G3.back();}
+function g3Next(){G3.next();}     function g3PauseResume(){G3.pauseResume();}
+function g3ResetTimer(){G3.resetTimer();}
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+renderScoreboards();
+</script>
+
+</body>
+</html>
