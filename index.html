@@ -1453,11 +1453,20 @@ function markCorrect(containerId, answer) {
   });
 }
 
+function shuffleChoices(d) {
+  const order = d.choices.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return { choices: order.map(i => d.choices[i]), answer: order.indexOf(d.answer) };
+}
+
 /* ============================================================
    SHARED GAME ENGINE FACTORY
    ============================================================ */
 function makeGame(prefix, dataset) {
-  const state = { index: 0, timer: null, remaining: 0, paused: false };
+  const state = { index: 0, timer: null, remaining: 0, paused: false, shuffled: null };
   const getEl = id => document.getElementById(prefix + '-' + id);
 
   function stop() { if (state.timer) { clearInterval(state.timer); state.timer = null; } }
@@ -1511,7 +1520,8 @@ function makeGame(prefix, dataset) {
       db.textContent = d.difficulty.toUpperCase();
       db.className = 'difficulty-badge diff-' + d.difficulty;
     }
-    renderChoices(prefix + '-choices', d.choices);
+    state.shuffled = shuffleChoices(d);
+    renderChoices(prefix + '-choices', state.shuffled.choices);
     getEl('reveal-btn').style.display = 'inline-block';
     getEl('next-btn').style.display = 'none';
     getEl('explanation-card').style.display = 'none';
@@ -1522,7 +1532,7 @@ function makeGame(prefix, dataset) {
   function reveal() {
     stop();
     const d = dataset[state.index];
-    markCorrect(prefix + '-choices', d.answer);
+    markCorrect(prefix + '-choices', state.shuffled.answer);
     getEl('explanation').innerHTML = d.explanation;
     const card = getEl('explanation-card');
     card.classList.toggle('trivia-reveal', d.type === 'trivia');
